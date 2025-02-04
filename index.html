@@ -64,7 +64,7 @@
         let teamBName = localStorage.getItem("teamBName") || "Команда B";
 
         async function fetchOdds() {
-            const res = await fetch("https://pomidor04ka.github.io/tagirbett/odds");
+            const res = await fetch("https://5e54-194-87-1-107.ngrok-free.app/tagirbett/odds");
             const data = await res.json();
 
             const teams = Object.keys(data);
@@ -88,7 +88,7 @@
         }
 
         async function updateBalance() {
-            const res = await fetch("https://pomidor04ka.github.io/tagirbett/get-balance", {
+            const res = await fetch("https://5e54-194-87-1-107.ngrok-free.app/get-balance", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token })
@@ -103,7 +103,7 @@
         async function register() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
-            const res = await fetch("https://pomidor04ka.github.io/tagirbett/register", {
+            const res = await fetch("https://5e54-194-87-1-107.ngrok-free.app/tagirbett/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
@@ -114,7 +114,7 @@
         async function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
-            const res = await fetch("https://pomidor04ka.github.io/tagirbett/login", {
+            const res = await fetch("https://5e54-194-87-1-107.ngrok-free.app/tagirbett/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
@@ -142,7 +142,7 @@
             const amount = prompt(`Сколько ставите на ${team}?`);
             if (!amount || isNaN(amount) || amount <= 0) return;
 
-            const res = await fetch("https://pomidor04ka.github.io/tagirbett/bet", {
+            const res = await fetch("https://5e54-194-87-1-107.ngrok-free.app/tagirbett/bet", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token, team, amount: parseInt(amount) })
@@ -158,7 +158,7 @@
             const winner = document.getElementById("winner").value;
             if (!winner) return alert("Введите победителя");
 
-            const res = await fetch("https://pomidor04ka.github.io/tagirbett/declare-winner", {
+            const res = await fetch("https://5e54-194-87-1-107.ngrok-free.app/declare-winner", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token, winner })
