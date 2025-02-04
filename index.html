@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAGIRBET</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .team { margin: 10px; padding: 10px; border: 1px solid #000; display: inline-block; cursor: pointer; }
+        #adminPanel { display: none; }
+        .odds-container { display: flex; align-items: center; justify-content: center; margin-top: 20px; }
+        .team-name { width: 100px; font-weight: bold; }
+        .odds-bar { position: relative; width: 300px; height: 30px; border-radius: 5px; overflow: hidden; border: 2px solid black; }
+        .odds-green { position: absolute; height: 100%; background-color: green; left: 0; }
+        .odds-red { position: absolute; height: 100%; background-color: red; right: 0; }
+        .odds-value { position: absolute; width: 100%; text-align: center; font-weight: bold; color: white; line-height: 30px; }
+    </style>
+</head>
+<body>
+    <h1>TAGIRBET</h1>
+
+    <div id="auth">
+        <input type="text" id="username" placeholder="Логин">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="register()">Регистрация</button>
+        <button onclick="login()">Войти</button>
+    </div>
+
+    <h2 id="balance" style="display:none;"></h2>
+
+    <div id="teams" style="display:none;">
+        <div id="teamA" class="team" onclick="placeBet(teamAName)"></div>
+        <div id="teamB" class="team" onclick="placeBet(teamBName)"></div>
+    </div>
+
+    <h2>Коэффициенты</h2>
+    <div class="odds-container">
+        <div id="teamA-name" class="team-name"></div>
+        <div class="odds-bar">
+            <div class="odds-green" id="greenBar"></div>
+            <div class="odds-red" id="redBar"></div>
+            <div class="odds-value" id="oddsText">Загрузка...</div>
+        </div>
+        <div id="teamB-name" class="team-name"></div>
+    </div>
+
+    <div id="adminPanel">
+        <h3>Админ панель</h3>
+        <div>
+            <input type="text" id="teamAInput" placeholder="Название команды A">
+            <input type="text" id="teamBInput" placeholder="Название команды B">
+            <button onclick="setTeams()">Установить команды</button>
+        </div>
+        <div>
+            <input type="text" id="winner" placeholder="Победитель">
+            <button onclick="declareWinner()">Объявить победителя</button>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem("token");
+
+        let teamAName = localStorage.getItem("teamAName") || "Команда A";
+        let teamBName = localStorage.getItem("teamBName") || "Команда B";
+
+        async function fetchOdds() {
+            const res = await fetch("http://localhost:3000/odds");
+            const data = await res.json();
+
+            const teams = Object.keys(data);
+            if (teams.length === 2) {
+                const teamAOdd = parseFloat(data[teams[0]]).toFixed(2);
+                const teamBOdd = parseFloat(data[teams[1]]).toFixed(2);
+
+                const total = parseFloat(teamAOdd) + parseFloat(teamBOdd);
+                const greenPercent = (parseFloat(teamAOdd) / total) * 100;
+                const redPercent = 100 - greenPercent;
+
+                document.getElementById("greenBar").style.width = `${greenPercent}%`;
+                document.getElementById("redBar").style.width = `${redPercent}%`;
+                document.getElementById("oddsText").textContent = `${teamAOdd} - ${teamBOdd}`;
+
+                document.getElementById("teamA-name").textContent = teamAName;
+                document.getElementById("teamB-name").textContent = teamBName;
+            } else {
+                document.getElementById("oddsText").textContent = "Нет данных";
+            }
+        }
+
+        async function updateBalance() {
+            const res = await fetch("http://localhost:3000/get-balance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById("balance").textContent = `Баланс: ${data.points}`;
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const res = await fetch("http://localhost:3000/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            alert((await res.json()).message);
+        }
+
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const res = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                token = data.token;
+                localStorage.setItem("token", token);
+                document.getElementById("balance").textContent = `Баланс: ${data.points}`;
+                document.getElementById("balance").style.display = "block";
+                document.getElementById("auth").style.display = "none";
+                document.getElementById("teams").style.display = "block";
+
+                if (username === "admin") {
+                    document.getElementById("adminPanel").style.display = "block";
+                }
+                updateBalance();
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function placeBet(team) {
+            const amount = prompt(`Сколько ставите на ${team}?`);
+            if (!amount || isNaN(amount) || amount <= 0) return;
+
+            const res = await fetch("http://localhost:3000/bet", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, team, amount: parseInt(amount) })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+            updateBalance();
+            fetchOdds();
+        }
+
+        async function declareWinner() {
+            const winner = document.getElementById("winner").value;
+            if (!winner) return alert("Введите победителя");
+
+            const res = await fetch("http://localhost:3000/declare-winner", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, winner })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+            updateBalance();
+            fetchOdds();
+        }
+
+        function setTeams() {
+            const teamAInput = document.getElementById("teamAInput").value;
+            const teamBInput = document.getElementById("teamBInput").value;
+
+            if (teamAInput) {
+                teamAName = teamAInput;
+                localStorage.setItem("teamAName", teamAName);
+            }
+            if (teamBInput) {
+                teamBName = teamBInput;
+                localStorage.setItem("teamBName", teamBName);
+            }
+
+            fetchOdds();
+        }
+
+        fetchOdds();
+    </script>
+</body>
+</html>

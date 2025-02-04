@@ -1,0 +1,38 @@
+{
+  "42": {
+    "password": "$2a$10$E5hi7xyfJNMfVB67UpkH4u482D4YQut243TSCtxxqADmZH6ctwfq6",
+    "points": 8437.5
+  },
+  "Svertuhivrot": {
+    "password": "$2a$10$M5MX0thohgfHFBZu8FgLTOFOcC.3fhkQWYB9mDIBnwP7IaCB0R4Py",
+    "points": 989
+  },
+  "tagir": {
+    "password": "$2a$10$5rJDwUD7n.xLDRFZkNEk4e2zcdojeUhbqqk.Zi.FLSpYTLjkXazwq",
+    "points": 790
+  },
+  "zalu": {
+    "password": "$2a$10$aJ.NOcnIWh6gwzA3Imt1aex9l7dLPG5vBvySQSsfpiGSfGSn/xCL6",
+    "points": 800
+  },
+  "admin2": {
+    "password": "$2a$10$z0KBfIKMH8uZO8HS0HnkkOOcq1kjC.jafHLM/9WXv00dQuoz28AeS",
+    "points": 10000
+  },
+  "tagir2": {
+    "password": "$2a$10$O49laXE7f7yhmFn0Io7HC.xLm6I1q/BwfcS2k9kY8Nx8o0FN0Tzr2",
+    "points": 1000
+  },
+  "ga": {
+    "password": "$2a$10$gexX4a.FpaH6BKPPj.GAYexqazjK7LDA.c9DM03/xidYqzUmJhuKa",
+    "points": 1000
+  },
+  "da": {
+    "password": "$2a$10$yfOY66jwNRCCHmAafomI.OzxlOwkGAjeorDpUlvqHd4hbhJmsmlU.",
+    "points": 900
+  },
+  "admin": {
+    "password": "$2a$10$CCyXf.QHhnEOPjrC6ADZQuwDEsc75vJggLyBa5m0XO84D4H8RGsvK",
+    "points": 9996562.5
+  }
+}
